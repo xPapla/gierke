@@ -55,6 +55,7 @@ const loop = () => {
           }
         });
       }
+      resized = false;
     }
 
     // update
