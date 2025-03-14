@@ -44,7 +44,7 @@ export class Vec2 {
       (direction & Direction.Right ? 1 : 0) -
         (direction & Direction.Left ? 1 : 0),
       (direction & Direction.Down ? 1 : 0) - (direction & Direction.Up ? 1 : 0)
-    );
+    ).normalize();
   }
 
   magnitude(): number {

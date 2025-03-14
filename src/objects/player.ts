@@ -13,7 +13,7 @@ export class Player implements Updatable, Drawable, HandlesMount {
 
   direction = Direction.None;
   position = new Vec2(0, 0);
-  acceleration = new Vec2(0, 0);
+  velocity = new Vec2(0, 0);
 
   onMount() {
     window.addEventListener("keydown", (e) => {
@@ -52,7 +52,7 @@ export class Player implements Updatable, Drawable, HandlesMount {
 
   update() {
     const time = getTime();
-    const acceleration = 1500;
+    const accelerationRate = 1500;
     const friction = 4;
     const maxVelocity = 300;
 
@@ -60,28 +60,29 @@ export class Player implements Updatable, Drawable, HandlesMount {
     const direction = Vec2.fromDirection(this.direction);
 
     // Apply acceleration in the direction of movement
-    if (direction.magnitude() > 0) {
-      const normalizedDirection = direction.normalize();
-      this.acceleration = this.acceleration.add(
-        normalizedDirection.multiply(acceleration * time.deltaTimeSeconds)
-      );
-    }
+    const acceleration =
+      direction.magnitude() > 0
+        ? direction.normalize().multiply(accelerationRate)
+        : Vec2.zero();
 
-    // Apply friction when not accelerating or decelerating
-    if (direction.magnitude() === 0) {
-      this.acceleration = this.acceleration.multiply(
-        1 - friction * time.deltaTimeSeconds
-      );
-    }
+    // Apply acceleration to velocity
+    this.velocity = this.velocity.add(
+      acceleration.multiply(time.deltaTimeSeconds)
+    );
+
+    // Apply friction to slow down
+    this.velocity = this.velocity.multiply(
+      1 - friction * time.deltaTimeSeconds
+    );
 
     // Limit maximum velocity
-    if (this.acceleration.magnitude() > maxVelocity) {
-      this.acceleration = this.acceleration.normalize().multiply(maxVelocity);
+    if (this.velocity.magnitude() > maxVelocity) {
+      this.velocity = this.velocity.normalize().multiply(maxVelocity);
     }
 
     // Apply velocity to position
     this.position = this.position.add(
-      this.acceleration.multiply(time.deltaTimeSeconds)
+      this.velocity.multiply(time.deltaTimeSeconds)
     );
   }
 
